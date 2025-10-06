@@ -1,0 +1,13 @@
+# Gradle
+.gradle/
+build/
+**/build/
+gradle/wrapper/*.jar
+
+# Android Studio
+.idea/
+*.iml
+
+# Misc
+local.properties
+.DS_Store
