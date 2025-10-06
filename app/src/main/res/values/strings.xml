@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ChimuBot Maker</string>
+    <string name="notification_log_title">알림 파서 로그</string>
+    <string name="notification_log_subtitle">카카오톡 알림 본문과 파싱 결과를 실시간으로 확인하세요.</string>
+    <string name="notification_log_empty">수신된 카카오톡 알림이 아직 없습니다.</string>
+    <string name="notification_log_unknown_room">알 수 없는 대화방</string>
+    <string name="notification_log_unknown_sender">알 수 없는 보낸이</string>
+    <string name="notification_log_empty_body">본문 없음</string>
+    <string name="notification_log_metadata_format">%1$s · %2$s</string>
+</resources>
