@@ -13,27 +13,17 @@ ChimuBot Maker는 Android NotificationListenerService 기반의 자동 응답 �
 - 미디어를 완전 무인으로 전송하지 않으며, 필요 시 공유 Intent와 접근성 보조를 결합합니다.
 
 ## 시스템 구성
-대화 상태 추적과 텔레메트리 요구가 늘어남에 따라 `core` 모듈을 세분화하고, 영속 계층(`data/`)과 진단 기능(`features/diagnostics`)을 명시적으로 분리했습니다. 아래 구조는 알림 파이프라인과 운영 도구의 책임을 명확히 합니다.
+Gradle 멀티모듈 프로젝트로 1단계 프로토타입을 구성했습니다. `core` 하위 모듈은 알림 파이프라인의 핵심 요소를 담당하고, `app` 모듈은 Android 매니페스트와 서비스 선언을 보유합니다. 추후 `data/`, `features/`, `ui/` 모듈은 추가될 예정입니다.
 ```
-app/
+ChimuBot-Maker/
+ ├─ app/                    # AndroidManifest 및 서비스 선언, 모듈 wiring
  ├─ core/
- │   ├─ notif/              # 알림 파싱·Reply 핸들 추출
- │   ├─ rules/              # 규칙 DSL, 매칭 엔진, 샌드박스 실행
- │   ├─ dispatch/           # SendQueue, RateLimiter, Retry 정책
- │   ├─ state/              # 알림/대화 캐시, TTL 관리
- │   └─ sys/                # NotificationListenerService, ForegroundSvc
- ├─ data/
- │   ├─ store/              # Room/ProtoDatastore, DAO, 마이그레이션
- │   ├─ telemetry/          # 전송 로그, 실패 통계 수집
- │   └─ prefs/              # 사용자 설정, 기능 토글
- ├─ features/
- │   ├─ scripts/            # 규칙 작성 UI, 스크립트 배포
- │   ├─ sharing/            # 공유 Intent + 접근성 보조
- │   └─ diagnostics/        # 알림 흐름 모니터링, 재연도구
- └─ ui/
-     ├─ onboarding/         # 권한 온보딩, 배터리 최적화 안내
-     ├─ settings/           # 전역 설정, 규칙 관리 접근
-     └─ rules/              # 규칙 편집/테스트 화면
+ │   ├─ notif/              # NotificationListenerService, Kakao 알림 파싱
+ │   ├─ dispatch/           # Reply PendingIntent 큐잉, 레이트 리미터
+ │   └─ rules/              # 규칙 인터페이스, 샘플 RuleEngine 구현
+ ├─ data/                   # (추가 예정) Room/ProtoDatastore 계층
+ ├─ features/               # (추가 예정) FlowCanvas, Diagnostics 등
+ └─ ui/                     # (추가 예정) 온보딩, 설정, 룰 편집 화면
 ```
 
 ## 핵심 동작 요약
@@ -65,6 +55,13 @@ app/
 
 ## 기능 로드맵
 알림 파이프라인을 기반으로 실제 메신저 자동 응답 봇을 완성하기 위해 다음 단계별 기능을 계획합니다. 각 항목은 `core/`, `data/`, `features/`, `ui/` 모듈의 책임 분리에 맞춰 진행하며, 선행 조건과 산출물을 명확히 정의합니다.
+
+### 1단계 프로토타입 구현 현황
+- **NotificationListenerService 배치:** `core/notif/ChimuNotificationListener`를 앱 매니페스트에 등록하고, 서비스 생성 시 `RuleEngine`과 `ReplyDispatcher`를 초기화합니다.
+- **카카오톡 전용 필터:** `NotificationTargetRegistry`에 `KakaoTalkOnlyFilter`를 설치해 `com.kakao.talk` 알림만 처리합니다.
+- **알림 파싱 모델:** `NotificationParser`가 MessagingStyle 메시지 배열에서 최신 본문과 발신자를 추출해 `CapturedNotification` 데이터 클래스로 매핑합니다.
+- **Reply 큐 프로토타입:** `core/dispatch/ReplyDispatcher`가 코루틴 채널을 사용해 Reply PendingIntent 전송을 직렬화하고, `ReplySender`가 RemoteInput에 텍스트를 주입합니다.
+- **샘플 RuleEngine:** `SimpleLoggingRuleEngine`이 “자동응답” 키워드를 감지하면 테스트용 응답 메시지를 큐에 넣습니다.
 
 ### 1단계: 카카오톡 알림 파싱 기반 구축
 - **목표:** 카카오톡의 채팅 알림 구조를 안정적으로 해석하여 `CapturedNotification` 모델에 담습니다.

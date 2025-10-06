@@ -134,5 +134,14 @@ if (msg.includes("주문")) {
 ---
 
 ## 10. 요약 비전
-> **ChimuBot Maker = Node-RED + 메신저봇 R + Notification Automation**  
+> **ChimuBot Maker = Node-RED + 메신저봇 R + Notification Automation**
 > GUI로 규칙을 만들고, JS 로직을 혼합하며, 메신저봇 R 스크립트까지 실행하는 루트리스 자동응답 플랫폼.
+
+---
+
+## 11. 1단계 코드 구현 지침
+- `core/notif`은 **KakaoTalk 알림 전용 필터**를 기본값으로 유지한다. 다른 메신저를 다룰 때는 새로운 `NotificationTargetFilter`를 추가하고 레지스트리에 명시적으로 교체한다.
+- `core/dispatch`의 `ReplyDispatcher`는 코루틴 기반 싱글 컨슈머를 유지하며, rate-limit 상수는 80~200ms 범위 내에서만 수정한다. 재시도 정책을 확장할 때는 `RuleEngine`에 실패 신호를 전달할 수 있는 콜백을 추가한다.
+- `core/rules`는 `RuleEngineRegistry`를 통해 전역 인스턴스를 노출한다. NotificationListener에서 직접 구현 클래스를 참조하지 말고, 레지스트리에 주입하도록 유지한다.
+- Kotlin JVM 타겟은 17로 고정하며, 새로운 모듈을 추가할 때 동일한 `compileOptions`/`kotlinOptions` 설정을 복제한다.
+- 테스트나 샘플 코드를 위해 `SimpleLoggingRuleEngine`을 수정할 경우, README의 “1단계 프로토타입 구현 현황”을 갱신해 동작이 어떻게 바뀌었는지 기록한다.
