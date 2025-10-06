@@ -13,29 +13,27 @@ ChimuBot Maker는 Android NotificationListenerService 기반의 자동 응답 �
 - 미디어를 완전 무인으로 전송하지 않으며, 필요 시 공유 Intent와 접근성 보조를 결합합니다.
 
 ## 시스템 구성
+대화 상태 추적과 텔레메트리 요구가 늘어남에 따라 `core` 모듈을 세분화하고, 영속 계층(`data/`)과 진단 기능(`features/diagnostics`)을 명시적으로 분리했습니다. 아래 구조는 알림 파이프라인과 운영 도구의 책임을 명확히 합니다.
 ```
 app/
  ├─ core/
- │   ├─ notif/
- │   │   ├─ NotificationParser.kt
- │   │   ├─ ReplyActionFinder.kt
- │   │   └─ ReplySender.kt
- │   ├─ engine/
- │   │   ├─ RuleEngine.kt
- │   │   ├─ SendQueue.kt
- │   │   └─ RateLimiter.kt
- │   ├─ store/
- │   │   ├─ Entities.kt
- │   │   └─ Dao.kt
- │   └─ sys/
- │       ├─ NotifListener.kt
- │       └─ ForegroundSvc.kt
+ │   ├─ notif/              # 알림 파싱·Reply 핸들 추출
+ │   ├─ rules/              # 규칙 DSL, 매칭 엔진, 샌드박스 실행
+ │   ├─ dispatch/           # SendQueue, RateLimiter, Retry 정책
+ │   ├─ state/              # 알림/대화 캐시, TTL 관리
+ │   └─ sys/                # NotificationListenerService, ForegroundSvc
+ ├─ data/
+ │   ├─ store/              # Room/ProtoDatastore, DAO, 마이그레이션
+ │   ├─ telemetry/          # 전송 로그, 실패 통계 수집
+ │   └─ prefs/              # 사용자 설정, 기능 토글
  ├─ features/
- │   ├─ scripts/
- │   └─ sharing/
+ │   ├─ scripts/            # 규칙 작성 UI, 스크립트 배포
+ │   ├─ sharing/            # 공유 Intent + 접근성 보조
+ │   └─ diagnostics/        # 알림 흐름 모니터링, 재연도구
  └─ ui/
-     ├─ SettingsActivity.kt
-     └─ RulesActivity.kt
+     ├─ onboarding/         # 권한 온보딩, 배터리 최적화 안내
+     ├─ settings/           # 전역 설정, 규칙 관리 접근
+     └─ rules/              # 규칙 편집/테스트 화면
 ```
 
 ## 핵심 동작 요약
