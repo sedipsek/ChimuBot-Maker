@@ -44,8 +44,9 @@
 ---
 
 ## 3. 하이브리드 모델
-각 노드에는 옵션으로 **JS Script Block**을 내장할 수 있다.  
+각 노드에는 옵션으로 **JS Script Block**을 내장할 수 있다.
 사용자가 GUI 노드 속성에서 직접 코드를 작성하면 엔진은 이를 QuickJS 샌드박스에서 실행한다.
+QuickJS 런타임은 메신저봇 R API2 사양에서 정의한 전역 객체(`Api`, `Log`, `Utils`, `FileStream` 등)를 동일한 시그니처로 바인딩해야 하며, 레퍼런스는 Dark Tornado와 KBOT Docs의 API2 문서를 기준으로 관리한다.
 
 예시 코드:
 ```
@@ -60,11 +61,12 @@ if (msg.includes("주문")) {
 ---
 
 ## 4. 메신저봇 R 호환성
-- 기존 메신저봇 R 스크립트(`response(room, msg, sender, isGroupChat, replier, ...)`)를 그대로 실행 가능.  
+- 기존 메신저봇 R 스크립트(`response(room, msg, sender, isGroupChat, replier, ...)`)를 그대로 실행 가능.
 - **ChimuCompatLayer.kt**에서 다음 API를 바인딩:
-  - `replier.reply(text)` → `core/dispatch/ReplySender.send()`로 위임  
-  - `Api`, `Log`, `FileStream`, `Utils` 등 Stub 구현  
-- GUI에서 `.js` 스크립트를 직접 불러와 Script Node로 삽입 가능.
+  - `replier.reply(text)` → `core/dispatch/ReplySender.send()`로 위임
+  - `Api`, `Log`, `FileStream`, `Utils`, `Device`, `Utils.getRoomList()` 등 API2에서 필수로 요구하는 객체/메서드를 Stub 또는 실제 동작과 연결
+- GUI에서 `.js` 스크립트를 직접 불러와 Script Node로 삽입 가능하며, 노드 속성 패널에서 API2 함수 호출을 템플릿으로 제안한다.
+- API2에서 새롭게 추가된 이벤트(`onCreate`, `onCommand`, `onNotificationPosted` 등)가 필요할 경우 FlowCanvas 노드 타입으로 선행 정의하고, Execution Runtime에서 해당 이벤트를 트리거로 매핑한다.
 
 ---
 
@@ -102,7 +104,7 @@ if (msg.includes("주문")) {
 |------|------|------|
 | **FlowCanvas** | 노드 드래그·연결, 연결선 렌더링 (Compose Canvas or ReactFlow) | `features/scripts/flowbuilder` |
 | **NodePropertyPanel** | 노드별 파라미터 편집 (정규식, 메시지 등) | `features/scripts/flowbuilder` |
-| **ScriptEditorDialog** | Script Node 용 코드 에디터 (Monaco / CodeMirror) | `features/scripts/editor` |
+| **ScriptEditorDialog** | Script Node 용 코드 에디터 (Monaco / CodeMirror), API2 함수 인텔리센스/자동완성 제공 | `features/scripts/editor` |
 | **SimulationPanel** | 입력 이벤트 테스트 + 로그 출력 | `features/diagnostics`와 연계 |
 | **FlowManager** | JSON 로드/세이브/내보내기 | `data/store` ↔ `features/scripts` |
 | **RuntimeConnector** | RuleEngine와 실시간 상태 동기화 | `core/rules` ↔ `features/scripts` |
@@ -114,7 +116,7 @@ if (msg.includes("주문")) {
 |------|------|
 | **언어/플랫폼** | Kotlin + Jetpack Compose |
 | **Persistence** | Room 또는 Proto DataStore |
-| **JS Runtime** | QuickJS 또는 Rhino (개발 단계에서 선택) |
+| **JS Runtime** | QuickJS 또는 Rhino (개발 단계에서 선택), API2 표준 전역 객체 바인딩 |
 | **네트워킹** | OkHttp / Retrofit |
 | **로깅** | Timber + 내장 LogView |
 | **멀티모듈** | `core/`(notif, rules, dispatch, state), `data/`(store, telemetry, prefs), `features/`(scripts, sharing, diagnostics), `runtime/compat`(메신저봇 API 브리지) |

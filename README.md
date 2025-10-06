@@ -107,9 +107,17 @@ app/
 - **주요 작업(초안):**
   - 규칙 템플릿 갤러리와 간단한 스크립트 편집기(`features/scripts`) 구현.
   - `RuleEngine`이 사용자 정의 파라미터(키워드, 응답 텍스트, 시간 제한 등)를 수용하도록 DSL 확장.
+  - API2 이벤트/액션 노드(예: `message`, `onCommand`, `Api.replyRoom`)와 매핑되는 노드 팔레트를 정의해 GUI와 JS 런타임이 동일한 계약을 공유하도록 설계.
   - 제작한 봇의 동작을 시뮬레이션하는 미리보기(테스트 알림과 연동) 제공.
 - **선행 조건:** 테스트 알림 생성기와 룸 기반 봇 제어가 안정화.
 - **완료 기준:** 최소 1개 이상의 커스텀 봇을 생성해 특정 룸에 배포하고, 자동 응답 결과를 텔레메트리에서 확인 가능.
+
+## 메신저봇 R API2 호환성 및 GUI 연계
+- **API2 스펙 준수:** JS 런타임과 Compat Layer는 메신저봇 R API2에서 정의된 전역 함수 및 객체(`response()`, `replier.reply()`, `Api.replyRoom()`, `Utils.getRoomList()` 등)를 동일한 시그니처로 노출하며, Dark Tornado 및 KBOT Docs의 API2 레퍼런스를 기준으로 검증합니다.
+- **노드 팔레트 설계:** FlowCanvas 상의 Trigger/Action 노드는 API2의 이벤트(`response`, `onCreate`, `onCommand`)와 행동(`Api.replyRoom`, `Api.sendImage`, `Api.reload`)을 표현할 수 있도록 타입과 파라미터를 제공합니다. 사용자가 GUI에서 선택한 노드는 실행 그래프 변환 시 API2 호환 JS 코드 스텁으로 직렬화됩니다.
+- **Script Node 가드:** Script Node 내부에서 API2 전역을 활용할 때 QuickJS 샌드박스가 동일한 객체를 바인딩해 개발자가 메신저봇 R 스크립트를 거의 수정 없이 가져올 수 있도록 합니다.
+- **테스트 전략:** 테스트 알림 생성기와 시뮬레이션 패널에서 API2 호출의 Mock 결과(예: `Api.replyRoom` 호출 횟수)를 기록하여 GUI·JS가 동일하게 동작하는지 확인합니다.
+- **문서화:** GUI 도움말과 개발자 문서에 API2 함수별 지원 상태와 예외 사항을 명시해 사용자가 호환 범위를 즉시 이해할 수 있도록 합니다.
 
 ### 장기 과제
 - 전송 큐 레이트 리미터 자동 튜닝(트래픽 기반 동적 조절).
@@ -120,3 +128,5 @@ app/
 - Android Developers: NotificationListenerService, RemoteInput, PendingIntent.
 - Microsoft Learn: `ACTION_NOTIFICATION_LISTENER_SETTINGS` 진입.
 - Google Play 정책: 접근성 서비스, 포그라운드 서비스 신고 요건.
+- Dark Tornado: KakaoTalk Bot API2 레퍼런스.
+- KBOT Docs: MessengerBot API2 함수 설명.
