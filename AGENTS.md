@@ -145,3 +145,9 @@ if (msg.includes("주문")) {
 - `core/rules`는 `RuleEngineRegistry`를 통해 전역 인스턴스를 노출한다. NotificationListener에서 직접 구현 클래스를 참조하지 말고, 레지스트리에 주입하도록 유지한다.
 - Kotlin JVM 타겟은 17로 고정하며, 새로운 모듈을 추가할 때 동일한 `compileOptions`/`kotlinOptions` 설정을 복제한다.
 - 테스트나 샘플 코드를 위해 `SimpleLoggingRuleEngine`을 수정할 경우, README의 “1단계 프로토타입 구현 현황”을 갱신해 동작이 어떻게 바뀌었는지 기록한다.
+
+## 12. 2단계 Reply 전송 고도화 지침
+- `core/state/ReplyHandleCache`는 Reply `PendingIntent`의 TTL을 `SystemClock.elapsedRealtime()` 기준으로 관리한다. 알림이 교체되거나 제거되면 반드시 `invalidate(key)`를 호출하고, UI와 동기화되는 `metrics` 흐름을 최신 상태로 유지한다.
+- `core/state/ReplySendTelemetry`는 `ReplySendObserver` 인터페이스를 구현해 성공/실패/재시도 이벤트를 `StateFlow`로 노출한다. UI는 이 흐름을 직접 구독하므로 필드를 제거하거나 이름을 바꿀 때는 README와 레이아웃 문서를 동시에 수정한다.
+- `ReplyDispatcher`는 `ReplyHandleProvider`를 통해 핸들을 조회하고, 실패 시 `handleProvider.invalidate()`로 캐시를 무효화한다. 백오프는 300ms부터 시작해 두 배씩 증가하되 1.2s를 상한으로 유지한다.
+- UI 모듈(`NotificationLogActivity`)은 Stage 2 Telemetry를 시각화해야 하므로, 전송 관련 변경 시 상단 카드가 새로운 메트릭을 반영하도록 업데이트한다.

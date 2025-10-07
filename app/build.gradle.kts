@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":core:notif"))
     implementation(project(":core:dispatch"))
     implementation(project(":core:rules"))
+    implementation(project(":core:state"))
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.recyclerview:recyclerview:1.3.2")

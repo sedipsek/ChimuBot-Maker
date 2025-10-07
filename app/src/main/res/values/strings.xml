@@ -7,4 +7,12 @@
     <string name="notification_log_unknown_sender">알 수 없는 보낸이</string>
     <string name="notification_log_empty_body">본문 없음</string>
     <string name="notification_log_metadata_format">%1$s · %2$s</string>
+    <string name="notification_log_metrics_title">Reply 전송 상태</string>
+    <string name="notification_log_metric_success">성공</string>
+    <string name="notification_log_metric_failure">실패</string>
+    <string name="notification_log_metric_retry">재시도</string>
+    <string name="notification_log_metric_last_error">마지막 오류: %1$s</string>
+    <string name="notification_log_metric_last_error_none">마지막 오류: 없음</string>
+    <string name="notification_log_metric_handles_template">활성 Reply 핸들: %1$d개 · 업데이트 %2$s</string>
+    <string name="notification_log_metric_handles_default">활성 Reply 핸들: 0개 · 업데이트 대기 중</string>
 </resources>

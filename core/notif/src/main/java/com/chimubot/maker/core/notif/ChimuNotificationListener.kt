@@ -4,6 +4,7 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import com.chimubot.maker.core.rules.RuleEngineRegistry
+import com.chimubot.maker.core.state.ReplyHandleCache
 
 class ChimuNotificationListener : NotificationListenerService() {
 
@@ -18,10 +19,15 @@ class ChimuNotificationListener : NotificationListenerService() {
             Log.d(TAG, "Package filtered: ${sbn.packageName}")
             return
         }
+        ReplyHandleCache.pruneExpired()
         val captured = NotificationParser.parse(sbn)
         if (captured == null) {
             Log.d(TAG, "Failed to parse notification: ${sbn.key}")
             return
+        }
+        val replyHandle = captured.replyHandle
+        if (replyHandle != null) {
+            ReplyHandleCache.upsert(captured.key, captured.room, replyHandle)
         }
         NotificationLogRepository.record(captured)
         RuleEngineRegistry.current().onIncoming(captured)
@@ -29,6 +35,7 @@ class ChimuNotificationListener : NotificationListenerService() {
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         Log.d(TAG, "Notification removed: ${sbn.key}")
+        ReplyHandleCache.invalidate(sbn.key)
     }
 
     companion object {

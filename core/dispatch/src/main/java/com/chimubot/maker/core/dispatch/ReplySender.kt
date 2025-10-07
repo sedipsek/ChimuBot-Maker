@@ -1,5 +1,6 @@
 package com.chimubot.maker.core.dispatch
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,12 @@ object ReplySender {
         val primaryKey = handle.remoteInputs.first().resultKey
         results.putCharSequence(primaryKey, text)
         RemoteInput.addResultsToIntent(handle.remoteInputs, fillIn, results)
-        handle.pendingIntent.send(context, 0, fillIn)
+        try {
+            handle.pendingIntent.send(context, 0, fillIn)
+        } catch (error: PendingIntent.CanceledException) {
+            throw ReplySendException.HandleExpired(error)
+        } catch (error: Exception) {
+            throw ReplySendException.TransportFailed(error)
+        }
     }
 }

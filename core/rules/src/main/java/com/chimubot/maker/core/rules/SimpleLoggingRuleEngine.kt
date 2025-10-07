@@ -25,7 +25,8 @@ class SimpleLoggingRuleEngine(
         dispatcher.enqueue(
             OutgoingMessage(
                 notificationKey = notification.key,
-                text = "[자동응답] ${triggerKeyword} 감지"
+                text = "[자동응답] ${triggerKeyword} 감지",
+                room = notification.room
             ),
             notification.replyHandle
         )

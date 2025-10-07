@@ -4,6 +4,8 @@ import android.content.Context
 import com.chimubot.maker.core.dispatch.ReplyDispatcher
 import com.chimubot.maker.core.rules.RuleEngineRegistry
 import com.chimubot.maker.core.rules.SimpleLoggingRuleEngine
+import com.chimubot.maker.core.state.ReplyHandleCache
+import com.chimubot.maker.core.state.ReplySendTelemetry
 
 object NotificationServiceInitializer {
     @Volatile
@@ -14,7 +16,11 @@ object NotificationServiceInitializer {
         if (!initialized) {
             synchronized(this) {
                 if (!initialized) {
-                    val createdDispatcher = ReplyDispatcher(context)
+                    val createdDispatcher = ReplyDispatcher(
+                        context = context,
+                        handleProvider = ReplyHandleCache,
+                        observer = ReplySendTelemetry
+                    )
                     dispatcher = createdDispatcher
                     NotificationTargetRegistry.install(KakaoTalkOnlyFilter)
                     RuleEngineRegistry.install(SimpleLoggingRuleEngine(createdDispatcher))

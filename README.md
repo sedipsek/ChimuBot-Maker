@@ -20,7 +20,8 @@ ChimuBot-Maker/
  ├─ core/
  │   ├─ notif/              # NotificationListenerService, Kakao 알림 파싱
  │   ├─ dispatch/           # Reply PendingIntent 큐잉, 레이트 리미터
- │   └─ rules/              # 규칙 인터페이스, 샘플 RuleEngine 구현
+ │   ├─ rules/              # 규칙 인터페이스, 샘플 RuleEngine 구현
+ │   └─ state/              # Reply 핸들 캐시, 전송 Telemetry
  ├─ data/                   # (추가 예정) Room/ProtoDatastore 계층
  ├─ features/               # (추가 예정) FlowCanvas, Diagnostics 등
  └─ ui/                     # (추가 예정) 온보딩, 설정, 룰 편집 화면
@@ -63,6 +64,13 @@ ChimuBot-Maker/
 - **알림 파싱 모델:** `NotificationParser`가 MessagingStyle 메시지 배열에서 최신 본문과 발신자를 추출해 `CapturedNotification` 데이터 클래스로 매핑합니다.
 - **Reply 큐 프로토타입:** `core/dispatch/ReplyDispatcher`가 코루틴 채널을 사용해 Reply PendingIntent 전송을 직렬화하고, `ReplySender`가 RemoteInput에 텍스트를 주입합니다.
 - **샘플 RuleEngine:** `SimpleLoggingRuleEngine`이 “자동응답” 키워드를 감지하면 테스트용 응답 메시지를 큐에 넣습니다.
+
+### 2단계 Reply 전송 루틴 고도화 현황
+- **Reply 핸들 캐시:** `core/state/ReplyHandleCache`가 알림 키/대화방 단위로 Reply `PendingIntent`와 TTL을 추적하고, 서비스 콜백에서 무효화·재등록을 수행합니다.
+- **전송 Telemetry:** `core/state/ReplySendTelemetry`가 성공/실패/재시도 횟수와 마지막 오류 메시지를 `StateFlow`로 내보내며, UI가 실시간으로 관찰합니다.
+- **Dispatcher 백오프:** `ReplyDispatcher`가 `ReplyHandleProvider`/`ReplySendObserver` 계약을 사용해 `PendingIntent.CanceledException` 발생 시 캐시를 무효화하고 0.3s→0.6s→1.2s 지수 백오프 재시도를 수행합니다.
+- **ReplySender 예외 맵핑:** `ReplySender`가 `PendingIntent.CanceledException`을 `ReplySendException.HandleExpired`로 래핑해 재시도 판단 근거를 명확히 합니다.
+- **Telemetry UI:** `NotificationLogActivity` 상단 카드가 전송 성공/실패/재시도 카운터와 활성 Reply 핸들 수·업데이트 시각을 함께 노출해 Stage 2 상태를 시각적으로 점검할 수 있습니다.
 
 ### 1단계: 카카오톡 알림 파싱 기반 구축
 - **목표:** 카카오톡의 채팅 알림 구조를 안정적으로 해석하여 `CapturedNotification` 모델에 담습니다.

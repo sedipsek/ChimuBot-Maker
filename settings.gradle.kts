@@ -4,5 +4,6 @@ include(
     ":app",
     ":core:notif",
     ":core:dispatch",
-    ":core:rules"
+    ":core:rules",
+    ":core:state"
 )

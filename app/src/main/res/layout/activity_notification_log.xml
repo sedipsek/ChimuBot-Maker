@@ -21,6 +21,112 @@
         android:text="@string/notification_log_subtitle"
         android:textAppearance="@android:style/TextAppearance.Material.Body1" />
 
+    <LinearLayout
+        android:id="@+id/notification_log_metrics_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="?android:attr/colorBackgroundFloating">
+
+        <TextView
+            android:id="@+id/notification_log_metrics_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notification_log_metrics_title"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notification_log_metric_success"
+                    android:textAppearance="@android:style/TextAppearance.Material.Caption" />
+
+                <TextView
+                    android:id="@+id/notification_log_metric_success_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notification_log_metric_failure"
+                    android:textAppearance="@android:style/TextAppearance.Material.Caption" />
+
+                <TextView
+                    android:id="@+id/notification_log_metric_failure_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notification_log_metric_retry"
+                    android:textAppearance="@android:style/TextAppearance.Material.Caption" />
+
+                <TextView
+                    android:id="@+id/notification_log_metric_retry_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/notification_log_metric_last_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/notification_log_metric_last_error_none"
+            android:textAppearance="@android:style/TextAppearance.Material.Body1" />
+
+        <TextView
+            android:id="@+id/notification_log_metric_handle_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/notification_log_metric_handles_default"
+            android:textAppearance="@android:style/TextAppearance.Material.Caption" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notification_log_list"
         android:layout_width="match_parent"

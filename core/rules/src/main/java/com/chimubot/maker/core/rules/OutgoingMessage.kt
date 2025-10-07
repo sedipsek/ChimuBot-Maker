@@ -6,6 +6,7 @@ package com.chimubot.maker.core.rules
 data class OutgoingMessage(
     val notificationKey: String,
     val text: String,
+    val room: String? = null,
     val attempt: Int = 0,
     val scheduledAt: Long = System.currentTimeMillis()
 )

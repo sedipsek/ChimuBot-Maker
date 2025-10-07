@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.chimubot.maker.core.notif"
+    namespace = "com.chimubot.maker.core.state"
     compileSdk = 34
 
     defaultConfig {
@@ -23,8 +23,6 @@ android {
 
 dependencies {
     implementation(project(":core:dispatch"))
-    implementation(project(":core:rules"))
-    implementation(project(":core:state"))
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
